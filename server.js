@@ -7,14 +7,35 @@ const types = {
   '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.ico':'image/x-icon',
   '.png':'image/png', '.txt':'text/plain; charset=utf-8'
 };
+const securityHeaders = {
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+  'content-security-policy': "default-src 'self' data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+};
 http.createServer((req, res) => {
-  let p = decodeURIComponent(req.url.split('?')[0]);
+  let p;
+  try {
+    p = decodeURIComponent(req.url.split('?')[0]);
+  } catch {
+    res.writeHead(400, { ...securityHeaders, 'content-type':'text/plain; charset=utf-8' });
+    return res.end('Bad request');
+  }
   if (p === '/' || p === '') p = '/index.html';
   const fp = path.join(root, path.normalize(p).replace(/^(\.\.[/\\])+/, ''));
-  if (!fp.startsWith(root)) { res.writeHead(403); return res.end('Forbidden'); }
+  if (!fp.startsWith(root)) {
+    res.writeHead(403, { ...securityHeaders, 'content-type':'text/plain; charset=utf-8' });
+    return res.end('Forbidden');
+  }
   fs.readFile(fp, (err, data) => {
-    if (err) { res.writeHead(404, {'content-type':'text/plain; charset=utf-8'}); return res.end('Not found'); }
-    res.writeHead(200, { 'content-type': types[path.extname(fp).toLowerCase()] || 'application/octet-stream' });
+    if (err) {
+      res.writeHead(404, { ...securityHeaders, 'content-type':'text/plain; charset=utf-8' });
+      return res.end('Not found');
+    }
+    const ext = path.extname(fp).toLowerCase();
+    const cache = ext === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable';
+    res.writeHead(200, { ...securityHeaders, 'content-type': types[ext] || 'application/octet-stream', 'cache-control': cache });
     res.end(data);
   });
 }).listen(port, () => console.log('Immobilien-Rechner läuft auf Port ' + port));

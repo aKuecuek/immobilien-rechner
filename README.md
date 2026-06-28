@@ -1,6 +1,6 @@
-# 🏠 Immobilien‑Investitionsrechner
+# Immobilien‑Investitionsrechner
 
-Eine professionelle, eigenständige Website zur belastbaren Kalkulation von Immobilien‑Kapitalanlagen (Deutschland, Stand 2026). Methodik rekonstruiert aus dem immocation‑Kalkulationstool und durch Tiefenrecherche zu Steuer‑ und Immobilienpraxis erweitert.
+Eine professionelle, eigenständige Website zur Kalkulation von Immobilien‑Kapitalanlagen in Deutschland. Sie kombiniert Eingaben, Cockpit, Verlauf, Exit, Stresstest, Bankfähigkeit, Ratgeber und Steuerstrategien in einer lokalen Web-App.
 
 ## Starten
 
@@ -31,8 +31,8 @@ Es ist eine einzelne, statische HTML‑Datei → überall hostbar:
 | **Stresstest** | Sensitivität bei Zins‑, Mietausfall‑, Wertsteigerungs‑ und Mietniveau‑Änderung |
 | **Bonität / Bank** | Haushaltsrechnung & Vermögensaufstellung fürs Bankgespräch |
 | **Anleitung & Ratgeber** | Schritt‑für‑Schritt‑Guide für Einsteiger: So nutzt du den Rechner, Kaufprozess (Vorbereitung → Notar → nach dem Kauf), Kennzahlen verständlich erklärt + Faustregeln, Anlagestrategien & typische Anfängerfehler |
-| **Steuer‑Tricks** | 71 legale Steueroptimierungs‑Strategien wie von einer Beraterin – nach Kategorien (AfA, Renovierung, Werbungskosten, Exit, Vermietungsart, Gesellschaften, Schenkung/Nießbrauch, Grunderwerbsteuer) mit Laienerklärung, Umsetzung, Rechenbeispiel, Rechtsgrundlage, Risiken & Quellen. Filterbar nach Einsteiger/Fortgeschritten/Profi. Faktengeprüft, Stand 2026 |
-| **Methodik & Quellen** | Alle Formeln, Steuerregeln 2026, GrESt‑Tabelle, autoritative Quellen |
+| **Steuerstrategien** | 71 legale Steuerstrategien nach Kategorien (AfA, Renovierung, Werbungskosten, Exit, Vermietungsart, Gesellschaften, Schenkung/Nießbrauch, Grunderwerbsteuer) mit Laienerklärung, Umsetzung, Rechenbeispiel, Rechtsgrundlage, Risiken & Quellen. Filterbar nach Einsteiger/Fortgeschritten/Profi und durchsuchbar. |
+| **Methodik & Quellen** | Kernformeln, Steuerregeln, GrESt‑Tabelle und fachliche Referenzen |
 
 > 💡 **Tooltips überall:** Hinter jedem Fachbegriff (auch bei den Kennzahlen im Cockpit, in den Tabellen und im Ratgeber) steckt ein kleines „i"‑Symbol. Mit Maus drüberfahren oder antippen zeigt eine kurze, laienverständliche Erklärung.
 
@@ -41,13 +41,13 @@ Es ist eine einzelne, statische HTML‑Datei → überall hostbar:
 - **💾 Speichern:** legt das Szenario im Browser ab (localStorage).
 - **⤓ Export / ⤒ Import:** Szenario als `.json`‑Datei sichern/laden (für Backup oder Weitergabe).
 
-## Steuerliche Grundlagen (Stand 2026, faktengeprüft)
+## Steuerliche Grundlagen
 
 - Einkommensteuertarif §32a EStG 2026 (Grundfreibetrag 12.348 €), Soli‑Milderungszone, Kirchensteuer, Splitting.
 - Grunderwerbsteuer aller 16 Länder auf aktuellem Stand (u. a. Bremen/Sachsen/Hamburg 5,5 %, Thüringen 5,0 %).
 - AfA linear 2 %/2,5 %/3 %, degressiv 5 %, Denkmal; AfA‑Bemessung über Gebäudeanteil.
 - Spekulationsfrist §23 EStG, anschaffungsnahe Herstellungskosten §6 EStG (15 %‑Grenze).
 
-Die ausführliche Referenz liegt unter `../REFERENZ_Immobilien_Kalkulationstool.md`.
+Für produktiven Einsatz sollten Quellenstand, fachliche Review-Freigabe und Änderungsdatum pro Rechenregel dokumentiert werden.
 
 > ⚠️ **Keine Steuer‑ oder Anlageberatung.** Alle Angaben ohne Gewähr; ersetzt keine Beratung durch Steuerberater:in/Bank.

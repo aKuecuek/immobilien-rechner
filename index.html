@@ -4,10 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Immobilien-Investitionsrechner — Profi-Kalkulation</title>
+<meta name="description" content="Professioneller Immobilien-Investitionsrechner für Kapitalanlagen in Deutschland: Cashflow, Rendite, Finanzierung, Steuern, Exit, Stresstest und Bankfähigkeit.">
+<meta name="theme-color" content="#0f1720">
+<meta property="og:title" content="Immobilien-Investitionsrechner">
+<meta property="og:description" content="Kapitalanlage-Immobilien fundiert kalkulieren: Rendite, Cashflow, Steuerwirkung, Exit und Stresstest.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232dd4bf'/%3E%3Ctext x='32' y='41' font-size='34' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' fill='%2304222b'%3E€%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#0f1720; --panel:#16212e; --panel2:#1c2937; --line:#28384a; --line2:#34465c;
-  --txt:#e7eef6; --muted:#9fb0c3; --muted2:#6f8198;
+  --txt:#e7eef6; --muted:#aab8c9; --muted2:#91a4ba;
   --accent:#2dd4bf; --accent2:#38bdf8; --accent-d:#0f766e;
   --green:#22c55e; --green-bg:#0e2a1a; --yellow:#eab308; --yellow-bg:#2a230a; --red:#ef4444; --red-bg:#2a1212;
   --blue:#3b82f6; --shadow:0 6px 24px rgba(0,0,0,.35);
@@ -20,6 +27,8 @@ body{font-family:var(--font);background:linear-gradient(180deg,#0c131c,#0f1720 2
 a{color:var(--accent2)}
 h1,h2,h3{margin:0 0 .4em}
 .wrap{max-width:1240px;margin:0 auto;padding:0 18px 80px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 
 /* Header */
 header.top{position:sticky;top:0;z-index:30;background:rgba(12,19,28,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -34,13 +43,18 @@ button.btn{background:var(--panel2);border:1px solid var(--line2);color:var(--tx
 button.btn:hover{border-color:var(--accent);color:#fff}
 button.btn.primary{background:linear-gradient(135deg,var(--accent-d),var(--accent));border:none;color:#04222b;font-weight:700}
 button.btn.ghost{background:transparent}
+button.btn .btn-ic{font-weight:800;color:var(--accent);line-height:1}
 
 /* Tabs */
+.tabs-wrap{position:relative}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:18px 0 14px}
+button.tab{font:inherit;background:transparent}
 .tab{padding:9px 15px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:600;border:1px solid transparent;display:flex;align-items:center;gap:7px}
 .tab:hover{color:var(--txt);background:var(--panel)}
 .tab.active{color:#fff;background:var(--panel2);border-color:var(--line2)}
-.tab .dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.tab[aria-selected="true"]{color:#fff;background:var(--panel2);border-color:var(--line2)}
+.tab-icon{width:22px;height:22px;border-radius:7px;background:#10212e;border:1px solid var(--line2);display:grid;place-items:center;color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.3px}
+.tab-hint{display:none;color:var(--muted2);font-size:11.5px;margin:-7px 0 12px}
 .view{display:none;animation:fade .25s}
 .view.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -71,6 +85,11 @@ button.btn.ghost{background:transparent}
 .subhead{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted2);margin:16px 0 9px;border-top:1px dashed var(--line);padding-top:12px}
 .subhead:first-child{border-top:none;padding-top:0;margin-top:0}
 .hint{font-size:11.5px;color:var(--muted2);margin-top:5px}
+.validation-stack{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.validation{border:1px solid var(--line2);border-left:3px solid var(--yellow);background:var(--yellow-bg);color:#f7dea0;border-radius:9px;padding:9px 12px;font-size:12.5px}
+.validation.bad{border-left-color:var(--red);background:var(--red-bg);color:#f4cccc}
+.field.invalid input,.field.invalid select{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.12)}
+.field.invalid .hint{color:#f4cccc}
 
 /* KPI cards */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
@@ -186,6 +205,10 @@ summary{cursor:pointer;padding:9px 0;font-weight:600}
 .lvlfilter{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 4px}
 .lvlfilter button{background:var(--panel2);border:1px solid var(--line2);color:var(--muted);border-radius:20px;padding:6px 13px;font:inherit;font-size:12.5px;cursor:pointer;transition:.15s}
 .lvlfilter button.on{background:linear-gradient(135deg,var(--accent-d),var(--accent));color:#04222b;border-color:transparent;font-weight:700}
+.filterbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 10px}
+.filterbar label{color:var(--muted);font-size:12.5px}
+.filterbar input{min-width:min(360px,100%);flex:1;background:var(--panel2);border:1px solid var(--line2);border-radius:9px;color:var(--txt);padding:9px 11px;font:inherit}
+.filter-count{color:var(--muted2);font-size:12px}
 .bignote{background:linear-gradient(135deg,#10212e,#16212e);border:1px solid var(--line2);border-left:4px solid var(--accent);border-radius:var(--radius-s);padding:14px 16px;color:var(--muted);font-size:13px;line-height:1.6;margin:14px 0}
 .bignote b{color:var(--txt)}
 
@@ -210,6 +233,7 @@ summary{cursor:pointer;padding:9px 0;font-weight:600}
   .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;margin:12px -11px 12px;padding:2px 11px 6px}
   .tabs::-webkit-scrollbar{height:0}
   .tab{flex:0 0 auto;scroll-snap-align:start;padding:9px 13px}
+  .tab-hint{display:block}
   /* zweispaltige Eingabe-Bereiche untereinander */
   .grid.cols-2{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr;gap:10px}
@@ -247,29 +271,33 @@ summary{cursor:pointer;padding:9px 0;font-weight:600}
 <body>
 <header class="top">
   <div class="top-inner">
-    <div class="brand"><div class="logo">€</div><div>Immobilien‑Investitionsrechner<small>Profi‑Kalkulation für Kapitalanlagen · Stand 2026 · von Aksel Kücük</small></div></div>
+    <div class="brand"><div class="logo" aria-hidden="true">€</div><div>Immobilien‑Investitionsrechner<small>Profi‑Kalkulation für Kapitalanlagen · Stand 2026 · von Aksel Kücük</small></div></div>
     <div class="top-actions no-print">
-      <div class="scenario"><span>Szenario:</span><input id="scenarioName" value="Mein Objekt" /></div>
-      <button class="btn" onclick="App.save()">💾 Speichern</button>
-      <button class="btn" onclick="App.exportJSON()">⤓ Export</button>
-      <button class="btn ghost" onclick="App.importJSON()">⤒ Import</button>
-      <button class="btn ghost" onclick="App.reset()">↺ Reset</button>
+      <div class="scenario"><label for="scenarioName">Szenario:</label><input id="scenarioName" value="Mein Objekt" /></div>
+      <button class="btn" onclick="App.save()"><span class="btn-ic" aria-hidden="true">S</span>Speichern</button>
+      <button class="btn" onclick="App.exportJSON()"><span class="btn-ic" aria-hidden="true">↓</span>Export</button>
+      <button class="btn ghost" onclick="App.importJSON()"><span class="btn-ic" aria-hidden="true">↑</span>Import</button>
+      <button class="btn ghost" onclick="App.reset()"><span class="btn-ic" aria-hidden="true">↺</span>Reset</button>
     </div>
   </div>
 </header>
 
-<div class="wrap">
-  <div class="tabs no-print" id="tabs"></div>
+<main class="wrap" id="appMain">
+  <h1 class="sr-only">Immobilien-Investitionsrechner für Kapitalanlagen</h1>
+  <nav class="tabs-wrap no-print" aria-label="Rechner-Bereiche">
+    <div class="tabs" id="tabs" role="tablist" aria-label="Rechner-Bereiche"></div>
+    <div class="tab-hint" aria-hidden="true">Weitere Bereiche seitlich wischen.</div>
+  </nav>
 
-  <section id="view-eingaben" class="view active"></section>
-  <section id="view-cockpit" class="view"></section>
-  <section id="view-verlauf" class="view"></section>
-  <section id="view-exit" class="view"></section>
-  <section id="view-stress" class="view"></section>
-  <section id="view-bonitaet" class="view"></section>
-  <section id="view-ratgeber" class="view"></section>
-  <section id="view-steuer" class="view"></section>
-  <section id="view-methodik" class="view"></section>
+  <section id="view-eingaben" class="view active" role="tabpanel" aria-labelledby="tab-eingaben"></section>
+  <section id="view-cockpit" class="view" role="tabpanel" aria-labelledby="tab-cockpit" aria-hidden="true"></section>
+  <section id="view-verlauf" class="view" role="tabpanel" aria-labelledby="tab-verlauf" aria-hidden="true"></section>
+  <section id="view-exit" class="view" role="tabpanel" aria-labelledby="tab-exit" aria-hidden="true"></section>
+  <section id="view-stress" class="view" role="tabpanel" aria-labelledby="tab-stress" aria-hidden="true"></section>
+  <section id="view-bonitaet" class="view" role="tabpanel" aria-labelledby="tab-bonitaet" aria-hidden="true"></section>
+  <section id="view-ratgeber" class="view" role="tabpanel" aria-labelledby="tab-ratgeber" aria-hidden="true"></section>
+  <section id="view-steuer" class="view" role="tabpanel" aria-labelledby="tab-steuer" aria-hidden="true"></section>
+  <section id="view-methodik" class="view" role="tabpanel" aria-labelledby="tab-methodik" aria-hidden="true"></section>
 
   <div class="disclaimer">
     ⚠️ <b>Keine Steuer- oder Anlageberatung.</b> Dieses Tool dient der überschlägigen Kalkulation und ersetzt
@@ -280,9 +308,9 @@ summary{cursor:pointer;padding:9px 0;font-weight:600}
     <span class="by">🛠️ Erstellt von <b>Aksel Kücük</b></span>
     <span>· Immobilien‑Investitionsrechner · © 2026</span>
   </div>
-</div>
+</main>
 
-<input type="file" id="fileInput" accept="application/json" style="display:none">
+<input type="file" id="fileInput" accept="application/json" aria-label="Szenario importieren" style="display:none">
 
 <script>
 "use strict";
@@ -416,7 +444,7 @@ const pct=(x,d=1)=> (isFinite(x)? (x*100).toLocaleString("de-DE",{minimumFractio
 const num=(x,d=0)=> (isFinite(x)?x:0).toLocaleString("de-DE",{minimumFractionDigits:d,maximumFractionDigits:d});
 /* Tooltip-Icon: erzeugt ein „i"-Symbol, das beim Hovern/Tippen die Erklärung zeigt.
    Funktioniert über das globale Tooltip-Objekt (body-appended → kein Clipping in KPIs/Tabellen). */
-const esc = s => String(s).replace(/"/g,"&quot;");
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
 function tip(text){ return text ? `<span class="ti" data-tip="${esc(text)}" tabindex="0" aria-label="${esc(text)}">i</span>` : ""; }
 
 /* Zentrales Glossar — laienverständliche Erklärungen, in Tooltips & Guide genutzt */
@@ -787,15 +815,15 @@ const BONI_DEBT=[
 function boniDefaults(){ const s={}; [...BONI_INCOME,...BONI_EXPENSE,...BONI_ASSET,...BONI_DEBT].forEach(f=>s[f.id]=f.def); return s; }
 
 const TABS=[
-  {id:"eingaben",label:"Eingaben",icon:"✏️"},
-  {id:"cockpit",label:"Cockpit",icon:"📊"},
-  {id:"verlauf",label:"Verlauf",icon:"📈"},
-  {id:"exit",label:"Exit & Verkauf",icon:"🚪"},
-  {id:"stress",label:"Stresstest",icon:"⚠️"},
-  {id:"bonitaet",label:"Bonität / Bank",icon:"🏦"},
-  {id:"ratgeber",label:"Anleitung & Ratgeber",icon:"📘"},
-  {id:"steuer",label:"Steuer-Tricks",icon:"💡"},
-  {id:"methodik",label:"Methodik & Quellen",icon:"📚"},
+  {id:"eingaben",label:"Eingaben",icon:"01"},
+  {id:"cockpit",label:"Cockpit",icon:"02"},
+  {id:"verlauf",label:"Verlauf",icon:"03"},
+  {id:"exit",label:"Exit & Verkauf",icon:"04"},
+  {id:"stress",label:"Stresstest",icon:"05"},
+  {id:"bonitaet",label:"Bonität / Bank",icon:"06"},
+  {id:"ratgeber",label:"Anleitung & Ratgeber",icon:"07"},
+  {id:"steuer",label:"Steuerstrategien",icon:"08"},
+  {id:"methodik",label:"Methodik & Quellen",icon:"09"},
 ];
 
 /* Ampel-Bewertung */
@@ -812,18 +840,18 @@ function field(f){
   const id=f.id, v=State[id];
   let inp;
   if(f.type==="select"){
-    inp=`<select id="f_${id}" ${f.compute?"":""} onchange="App.set('${id}',this.value)">${f.options.map(o=>`<option ${o===v?"selected":""}>${o}</option>`).join("")}</select>`;
+    inp=`<select id="f_${id}" ${f.compute?"aria-readonly=\"true\"":""} onchange="App.set('${id}',this.value)">${f.options.map(o=>`<option ${o===v?"selected":""}>${esc(o)}</option>`).join("")}</select>`;
   } else if(f.type==="date"){
-    inp=`<input id="f_${id}" type="date" value="${v||""}" onchange="App.set('${id}',this.value)">`;
+    inp=`<input id="f_${id}" type="date" value="${esc(v||"")}" onchange="App.set('${id}',this.value)">`;
   } else if(f.type==="text"){
-    inp=`<input id="f_${id}" type="text" value="${(v??"").toString().replace(/"/g,'&quot;')}" oninput="App.set('${id}',this.value)">`;
+    inp=`<input id="f_${id}" type="text" value="${esc(v??"")}" oninput="App.set('${id}',this.value)">`;
   } else {
     const unit=f.unit?`<span class="unit">${f.unit}</span>`:"";
-    inp=`<div class="in-wrap"><input id="f_${id}" type="number" step="any" class="${f.unit?'has-unit':''}" value="${v}" ${f.compute?'readonly':''} oninput="App.set('${id}',this.value)">${unit}</div>`;
+    inp=`<div class="in-wrap"><input id="f_${id}" type="number" inputmode="decimal" step="any" class="${f.unit?'has-unit':''}" value="${esc(v)}" ${f.compute?'readonly aria-readonly="true"':''} oninput="App.set('${id}',this.value)">${unit}</div>`;
   }
   const help=f.help?`<span class="help" data-tip="${esc(f.help)}" tabindex="0">?</span>`:"";
   return `<div class="field ${f.compute?'compute':''} ${f.full?'':''}">
-    <label>${f.label} ${help}</label>${inp}
+    <label for="f_${id}">${f.label} ${help}</label>${inp}
     <div class="hint" id="hint_${id}"></div></div>`;
 }
 function renderForm(){
@@ -833,10 +861,31 @@ function renderForm(){
   $("#view-eingaben").innerHTML=`
     <div class="note">Trage die Objektdaten ein. Alle Werte werden sofort berechnet — wechsle danach ins <b>Cockpit</b>.
       Felder mit gestricheltem Rand werden automatisch ermittelt (z. B. Grunderwerbsteuer je Bundesland; Gebäudeanteil bei Eingabe 0 %).</div>
+    <div class="validation-stack" id="inputWarnings" aria-live="polite"></div>
     <div class="grid cols-2" style="margin-top:16px;align-items:start">
       <div class="grid">${col(left)}</div>
       <div class="grid">${col(right)}</div>
     </div>`;
+}
+
+function inputWarnings(R){
+  const out=[];
+  if(State.kaufpreis<=0) out.push({type:"bad", text:"Kaufpreis muss größer als 0 sein, sonst sind Rendite und Faktor nicht belastbar."});
+  if(State.wohnflaeche<=0) out.push({type:"bad", text:"Wohnfläche muss größer als 0 sein, damit €/m², Rücklage und Gebäudeanteil sinnvoll berechnet werden."});
+  if(State.kaltmiete<=0) out.push({type:"bad", text:"Nettokaltmiete fehlt. Ohne Miete sind Cashflow, Faktor und Renditen nicht entscheidungsfähig."});
+  if(State.ekEingabe>R.gesamtinvest) out.push({type:"warn", text:"Eigenkapital liegt über der Gesamtinvestition. Prüfe, ob hier zu viel Liquidität angesetzt wurde."});
+  if(R.anschaffungsnahWarn) out.push({type:"bad", text:`Sofort-Aufwand überschreitet die 15 %-Grenze (${eur(R.grenze15)}). Steuerliche Behandlung vor Umsetzung prüfen.`});
+  if(State.ruecklageProSqm < R.ruecklagePetersProSqm*0.5) out.push({type:"warn", text:`Instandhaltungsrücklage ist deutlich unter der Peters-Näherung (${eur(R.ruecklagePetersProSqm)}/m²·a).`});
+  return out;
+}
+function renderInputWarnings(R){
+  const box=$("#inputWarnings"); if(!box) return;
+  const warnings=inputWarnings(R);
+  box.innerHTML=warnings.map(w=>`<div class="validation ${w.type==="bad"?"bad":""}">${esc(w.text)}</div>`).join("");
+  $$(".field.invalid").forEach(el=>el.classList.remove("invalid"));
+  if(State.kaufpreis<=0) $("#f_kaufpreis")?.closest(".field")?.classList.add("invalid");
+  if(State.wohnflaeche<=0) $("#f_wohnflaeche")?.closest(".field")?.classList.add("invalid");
+  if(State.kaltmiete<=0) $("#f_kaltmiete")?.closest(".field")?.classList.add("invalid");
 }
 
 /* ---------- Cockpit ---------- */
@@ -1086,8 +1135,8 @@ function renderBonitaet(R){
   const assets=BONI_ASSET.reduce((a,f)=>a+(+State[f.id]||0),0)+ (R.gesamtinvest); // dieses Objekt als Vermögenswert
   const debts=BONI_DEBT.reduce((a,f)=>a+(+State[f.id]||0),0)+ R.darlehenGesamt;
   const netto=assets-debts;
-  const fin=(arr,onPrefix)=>arr.map(f=>`<div class="field"><label>${f.label}</label>
-     <div class="in-wrap"><input type="number" step="any" class="has-unit" value="${State[f.id]}" oninput="App.set('${f.id}',this.value)"><span class="unit">€</span></div></div>`).join("");
+  const fin=(arr)=>arr.map(f=>`<div class="field"><label for="b_${f.id}">${f.label}</label>
+     <div class="in-wrap"><input id="b_${f.id}" type="number" inputmode="decimal" step="any" class="has-unit" value="${esc(State[f.id])}" oninput="App.set('${f.id}',this.value)"><span class="unit">€</span></div></div>`).join("");
   $("#view-bonitaet").innerHTML=`
     <div class="note">Für das Bankgespräch: Haushaltsrechnung (monatliche Tragfähigkeit) und Vermögensaufstellung. Der Kapitaldienst & die nicht umlagefähigen Kosten dieses Objekts sind automatisch berücksichtigt.</div>
     <div class="grid cols-2" style="margin-top:16px;align-items:start">
@@ -1147,7 +1196,7 @@ function renderMethodik(){
         <li><b>Verkaufsnebenkosten/Exit:</b> enthalten ggf. eine <b>Vorfälligkeitsentschädigung</b> — diese ist objektiv per Zinsschaden zu berechnen und kann deutlich über pauschalen 1–2 % liegen.</li>
         <li><b>Maklercourtage:</b> bei Verkauf einer Wohnung/eines EFH an Verbraucher gilt das <b>Halbteilungsprinzip</b> (§ 656c/d BGB).</li>
       </ul>
-      <div class="src" id="sources"><h4>Quellen (autoritativ, faktengeprüft)</h4><div id="sourceList">
+      <div class="src" id="sources"><h4>Quellen & fachliche Referenzen</h4><div id="sourceList">
         <a href="https://www.gesetze-im-internet.de/estg/__32a.html" target="_blank" rel="noopener">§ 32a EStG — Einkommensteuertarif (Gesetze im Internet)</a>
         <a href="https://www.gesetze-im-internet.de/estg/__7.html" target="_blank" rel="noopener">§ 7 EStG — Absetzung für Abnutzung (AfA)</a>
         <a href="https://www.gesetze-im-internet.de/estg/__23.html" target="_blank" rel="noopener">§ 23 EStG — Private Veräußerungsgeschäfte (Spekulationsfrist)</a>
@@ -1159,7 +1208,7 @@ function renderMethodik(){
         <a href="https://www.finanztip.de/immobilien-kapitalanlage/" target="_blank" rel="noopener">Finanztip — Immobilien als Kapitalanlage</a>
         <a href="https://immocation.de" target="_blank" rel="noopener">immocation — Immobilien-Wissen (Methodik-Vorlage)</a>
       </div></div>
-      <p style="margin-top:18px;color:var(--muted2)">Hinweis: Werte wie Gebäudekosten/m², Bodenwert-Schätzung und Default-Annahmen sind Richtwerte und sollten objektindividuell geprüft werden (Bodenrichtwert, Mietspiegel, reale Angebote). Eine ausführliche, faktengeprüfte Referenz liegt der Lieferung als <code>REFERENZ_Immobilien_Kalkulationstool.md</code> bei.</p>
+      <p style="margin-top:18px;color:var(--muted2)">Hinweis: Werte wie Gebäudekosten/m², Bodenwert-Schätzung und Default-Annahmen sind Richtwerte und sollten objektindividuell geprüft werden (Bodenrichtwert, Mietspiegel, reale Angebote). Für produktiven Einsatz sollten Quellenstand, fachliche Review-Freigabe und Änderungsdatum pro Rechenregel dokumentiert werden.</p>
     </div>`;
 }
 
@@ -1668,15 +1717,16 @@ function renderRatgeber(){
 }
 
 /* ======================= STEUER-TRICKS-TAB (Render) ====================== */
-// Steuer-Tricks Tab - generiert aus faktengeprüfter Tiefenrecherche (Stand 2026).
+// Steuerstrategien Tab - generiert aus geprüfter Fachrecherche (Stand 2026).
 // Korrekturen aus den Verifikations-Verdicts (teilweise/ueberholt/falsch) sind eingearbeitet.
 
 function renderSteuer(){
   document.querySelector("#view-steuer").innerHTML = `
-<div class="lead">Hier findest du die wirkungsvollsten legalen Steuer-Strategien für vermietete Immobilien - aufbereitet wie von einem Berater, faktengeprüft mit Stand 2026.</div>
+<div class="lead">Hier findest du legale Steuerstrategien für vermietete Immobilien - redaktionell strukturiert, mit Quellen, Risiken und Stand-Hinweisen.</div>
 <div class="lead sub">Jeder Fachbegriff ist mit einem Info-Icon erklärt: AfA ${tip("AfA = Absetzung für Abnutzung, die jährliche steuerliche Abschreibung des Gebäudewerts. Nur das Gebäude, nicht der Grund und Boden, wird abgeschrieben.")}, Werbungskosten ${tip("Werbungskosten sind Ausgaben zur Erzielung der Mieteinnahmen (z.B. Zinsen, Reparaturen, Verwaltung). Sie mindern die steuerpflichtigen Einkünfte aus Vermietung.")}, Grenzsteuersatz ${tip("Der Grenzsteuersatz ist der Steuersatz, mit dem der zuletzt verdiente Euro besteuert wird (in Deutschland 14% bis 45%). Er bestimmt, wie viel eine Werbungskosten-Position tatsächlich spart.")}, Spekulationsfrist ${tip("Spekulationsfrist: Wird eine Immobilie länger als 10 Jahre gehalten, ist der Verkaufsgewinn steuerfrei (§23 EStG). Bei Verkauf innerhalb der Frist ist der Gewinn steuerpflichtig.")}, Bemessungsgrundlage ${tip("Die Bemessungsgrundlage ist der Betrag, auf den ein Steuersatz angewendet wird - z.B. der Gebäudeanteil für die AfA oder der Kaufpreis für die Grunderwerbsteuer.")}, Restnutzungsdauer ${tip("Restnutzungsdauer: die verbleibende Zeit, über die ein Gebäude noch genutzt werden kann. Eine per Gutachten nachgewiesene kürzere Restnutzungsdauer erlaubt eine höhere jährliche AfA.")}, anschaffungsnahe Herstellungskosten ${tip("Anschaffungsnahe Herstellungskosten: Renovierungen in den ersten 3 Jahren nach Kauf über 15% des Gebäudewerts (netto) sind nicht sofort, sondern nur über die AfA absetzbar (§6 Abs.1 Nr.1a EStG).")}, Nießbrauch ${tip("Nießbrauch: das Recht, eine Sache zu nutzen und ihre Erträge (z.B. Mieten) zu ziehen, ohne Eigentümer zu sein. Bei der Schenkung mindert ein vorbehaltener Nießbrauch den steuerlichen Wert.")}, erweiterte Gewerbesteuerkürzung ${tip("Erweiterte Gewerbesteuerkürzung (§9 Nr.1 Satz 2 ff. GewStG): Eine Gesellschaft, die ausschließlich eigenen Grundbesitz verwaltet, kann ihren Mietertrag von der Gewerbesteuer freistellen.")}.</div>
 <div class="bignote"><b>Wichtiger Hinweis:</b> Es geht hier ausschließlich um LEGALE Steuergestaltung - also das Ausnutzen der vom Gesetzgeber vorgesehenen Regeln. Das hat nichts mit Schwarzbau, Schwarzgeld oder Steuerhinterziehung zu tun. Jede der hier beschriebenen Strategien sollte VOR der Umsetzung mit einer Steuerberaterin oder einem Steuerberater geprüft werden, da es auf den Einzelfall, das jeweilige Bundesland und den aktuellen Rechtsstand ankommt.</div>
-<div class="lvlfilter"><button class="on" onclick="steuerFilter('alle',this)">Alle</button><button onclick="steuerFilter('einsteiger',this)">Einsteiger</button><button onclick="steuerFilter('fortgeschritten',this)">Fortgeschritten</button><button onclick="steuerFilter('profi',this)">Profi</button></div>
+<div class="filterbar"><label for="steuerSearch">Strategien suchen</label><input id="steuerSearch" type="search" placeholder="z. B. AfA, Verkauf, Nießbrauch, GmbH" oninput="steuerSearch(this.value)"><span class="filter-count" id="steuerCount"></span></div>
+<div class="lvlfilter" role="group" aria-label="Strategien nach Erfahrungslevel filtern"><button class="on" onclick="steuerFilter('alle',this)">Alle</button><button onclick="steuerFilter('einsteiger',this)">Einsteiger</button><button onclick="steuerFilter('fortgeschritten',this)">Fortgeschritten</button><button onclick="steuerFilter('profi',this)">Profi</button></div>
 <div class="toc"><a href="#st-afa">🏚️ Abschreibung (AfA) maximieren</a><a href="#st-renovierung">🔨 Renovierung &amp; Modernisierung clever timen</a><a href="#st-werbungskosten">🧾 Werbungskosten - nichts verschenken</a><a href="#st-exit">🚪 Halten &amp; Verkaufen - steuerfrei raus</a><a href="#st-vermietung">🔑 Vermietungsart als Steuerhebel</a><a href="#st-struktur">🏦 Struktur &amp; Gesellschaften (für Vermögende)</a><a href="#st-schenkung">🎁 Schenken, Vererben &amp; Nießbrauch</a><a href="#st-grest">💶 Kaufnebenkosten &amp; Grunderwerbsteuer senken</a><a href="#st-gaps">✨ Weitere Profi-Strategien</a></div>
 <h2 class="sec-h" id="st-afa"><span class="ix">🏚️</span> Abschreibung (AfA) maximieren</h2>
 <div class="sec-intro">So holst du das Maximum aus der Gebäudeabschreibung heraus - vom richtigen AfA-Satz über Restnutzungsdauer-Gutachten bis zur Denkmal-AfA.</div>
@@ -1767,15 +1817,32 @@ function renderSteuer(){
 <details class="trick" data-level="fortgeschritten"><summary><span class="ar">▸</span> Zinsswap- und Forward-Darlehen-Kosten sowie Umschuldungs-Vorfälligkeit als Werbungskosten nutzen </summary><div class="body"><p>Wer ein Vermietungsdarlehen absichert oder umschuldet, verursacht Zusatzkosten (Swap-Zahlungen, Forward-Aufschlag, Vorfälligkeitsentschädigung). Bei fortgesetzter Vermietung sind diese Kosten als Werbungskosten absetzbar - das senkt die Steuerlast und macht die Anschlussfinanzierung günstiger.</p><span class="lab">So geht’s</span><p>Forward-Darlehen rechtzeitig vor Ablauf der Zinsbindung abschließen; der Forward-Aufschlag ist Teil der Schuldzinsen und absetzbar, solange das Objekt vermietet bleibt. Bei Umschuldung mit Ablösung des Altdarlehens ist die Vorfälligkeitsentschädigung als Werbungskosten abziehbar, wenn die Vermietung fortgeführt wird (NICHT abziehbar, wenn die Ablösung im Zusammenhang mit dem VERKAUF steht). Bei echten Zinsswaps zur Absicherung des Vermietungsdarlehens sind laufende Ausgleichszahlungen den Vermietungseinkünften zuzuordnen; bei vorzeitiger Swap-Auflösung ist die Abziehbarkeit der Ausgleichszahlung einzelfallabhängig und durch BFH-Rechtsprechung geprägt.</p><span class="lab">Rechenbeispiel</span><div class="ex">Umschuldung eines vermieteten Objekts: Vorfälligkeitsentschädigung 9.000 €, sofort als WK absetzbar -&gt; bei 42% ca. 3.780 € Steuerersparnis, weil weiter vermietet wird.</div><span class="lab">Rechtsgrundlage</span><div class="legal">§ 9 Abs. 1 S. 3 Nr. 1 EStG (Schuldzinsen/Geldbeschaffungskosten); BFH-Rechtsprechung zu Zinsswaps (u.a. VIII R 6/18) und zur Vorfälligkeitsentschädigung</div><span class="lab">Risiken &amp; Fallstricke</span><div class="risk">Bei Verkauf statt Weitervermietung ist die Vorfälligkeitsentschädigung NICHT abziehbar (kein Veranlassungszusammenhang mit Vermietung). Zinsswaps müssen tatsächlich der Absicherung des Vermietungsdarlehens dienen; bei reiner Spekulation oder fehlendem Zusammenhang droht Versagung. Bei vorzeitiger Swap-Beendigung ist die steuerliche Behandlung umstritten - aktuelle BFH-Rechtsprechung prüfen.</div><span class="lab">Für wen geeignet</span><p class="forwho">Vermieter mit auslaufender Zinsbindung in Hochzinsphasen, die absichern/umschulden und das Objekt behalten wollen.</p><div class="srcline">Quellen: <a href="https://www.brl.de/de/blog/zinsswaps-bei-einkuenften-aus-vermietung-und-verpachtung" target="_blank" rel="noopener">Quelle 1 (brl.de)</a> <a href="https://www.bundesfinanzhof.de/en/entscheidungen/entscheidungen-online/decision-detail/STRE202110124/" target="_blank" rel="noopener">Quelle 2 (bundesfinanzhof.de)</a> <a href="https://www.finanztip.de/baufinanzierung/forward-darlehen/" target="_blank" rel="noopener">Quelle 3 (finanztip.de)</a> <a href="https://www.vorfaelligkeitsentschaedigung.net/vorfaelligkeitsentschaedigung-steuerlich-absetzbar/" target="_blank" rel="noopener">Quelle 4 (vorfaelligkeitsentschaedigung.net)</a></div></div></details>
 <details class="trick" data-level="fortgeschritten"><summary><span class="ar">▸</span> Zweiterschließungs- und Anliegerbeiträge als Sofortaufwand statt Aktivierung im Boden </summary><div class="body"><p>Zahlt die Gemeinde für eine schon vorhandene Straße/Leitung eine Erneuerung an und Sie müssen sich als Eigentümer beteiligen, sind diese Beiträge bei vermieteten Objekten oft sofort voll absetzbar - im Gegensatz zur erstmaligen Erschließung, die auf den (nicht abschreibbaren) Bodenwert aktiviert werden müsste.</p><span class="lab">So geht’s</span><p>Bei Beiträgen prüfen, ob es sich um ERSTERSCHLIESSUNG handelt (-&gt; nachträgliche Anschaffungskosten des Grund und Bodens, nicht abschreibbar) oder um ERSATZ/Modernisierung einer vorhandenen Anlage (Zweiterschließung -&gt; regelmäßig sofort abziehbare Werbungskosten). Maßgeblich: Erhöht die Maßnahme Substanz/Wesen/bauliche Nutzbarkeit oder Lage des Grundstücks? Wenn nein -&gt; Sofortabzug. Beitragsbescheide und Verwendungszweck dokumentieren.</p><span class="lab">Rechenbeispiel</span><div class="ex">Sanierung der bereits vorhandenen Gemeindestraße, Anliegerbeitrag 8.000 € für ein vermietetes Grundstück -&gt; als Zweiterschließung sofort als WK abziehbar (nicht: auf Bodenwert aktivieren).</div><span class="lab">Rechtsgrundlage</span><div class="legal">§ 9 EStG (Werbungskosten) vs. § 255 HGB / § 6 EStG (Anschaffungskosten Grund und Boden); BFH-Rechtsprechung zur (Zweit-)Erschließung</div><span class="lab">Risiken &amp; Fallstricke</span><div class="risk">Bei erstmaliger Erschließung oder wenn die Nutzbarkeit/der Wert des Grundstücks steigt (z.B. höhere bauliche Ausnutzbarkeit), sind die Beiträge zwingend zu aktivieren und NICHT sofort absetzbar. Die Abgrenzung ist streitanfällig; saubere Dokumentation und ggf. Auskunft beim Finanzamt einholen.</div><span class="lab">Für wen geeignet</span><p class="forwho">Vermieter, die Anlieger-/Erschließungsbeiträge zahlen müssen und den Sofortabzug nutzen wollen.</p><div class="srcline">Quellen: <a href="https://www.haufe.de/id/beitrag/werbungskosten-vermietung-und-verpachtung-abc-erschliessungskosten-HI7016627.html" target="_blank" rel="noopener">Quelle 1 (haufe.de)</a> <a href="https://www.haufe.de/finance/haufe-finance-office-premium/erschliessungskostenanliegerbeitraege-grundsaetze-und-einzelfaelle_idesk_PI20354_HI2073223.html" target="_blank" rel="noopener">Quelle 2 (haufe.de)</a> <a href="https://www.haufe.de/finance/haufe-finance-office-premium/zweiterschliessung-nachtraegliche-anschaffungskosten-des-grund-und-bodens_idesk_PI20354_HI20584.html" target="_blank" rel="noopener">Quelle 3 (haufe.de)</a></div></div></details>
 <details class="trick" data-level="fortgeschritten"><summary><span class="ar">▸</span> § 35c EStG (energetische Sanierung) clever nur für den selbstgenutzten Teil - vermieteter Teil läuft über Werbungskosten/AfA </summary><div class="body"><p>Die 20%-Steuerermäßigung für energetische Sanierung (§ 35c EStG) gibt es NUR für selbstgenutztes Wohneigentum, nicht für vermietete Objekte. Bei gemischt genutzten Häusern (Sie wohnen oben, vermieten unten) lässt sich aber kombinieren: für den eigenen Teil die § 35c-Förderung, für den vermieteten Teil der normale Werbungskosten-/AfA-Abzug.</p><span class="lab">So geht’s</span><p>Bei einem teils selbstgenutzten, teils vermieteten Gebäude die Sanierungskosten flächenanteilig aufteilen. Für den eigengenutzten Anteil § 35c EStG: 20% der Kosten über 3 Jahre (7%/7%/6%, max. 40.000 € pro Objekt) direkt von der Steuerschuld abziehen. Für den vermieteten Anteil die Kosten als Erhaltungsaufwand (sofort bzw. nach § 82b EStDV verteilt) oder als Herstellungsaufwand (AfA) ansetzen. Wichtig: für denselben Aufwand kein Doppelabzug.</p><span class="lab">Rechenbeispiel</span><div class="ex">Zweifamilienhaus, 50% selbst genutzt, 50% vermietet, Dämmung 60.000 €. Selbstgenutzter Anteil 30.000 € -&gt; 20% = 6.000 € direkt von der Steuerschuld (über 3 Jahre). Vermieteter Anteil 30.000 € als Werbungskosten/AfA.</div><span class="lab">Rechtsgrundlage</span><div class="legal">§ 35c EStG (Steuerermäßigung selbstgenutzte Gebäude); BMF-Schreiben vom 21.08.2025 zu Einzelfragen § 35c EStG; § 9/§ 21 EStG für den vermieteten Teil</div><span class="lab">Risiken &amp; Fallstricke</span><div class="risk">Reine Vermietungsobjekte sind von § 35c GANZ ausgeschlossen. Selbstnutzung muss in den Abzugsjahren tatsächlich bestehen - bei Verkauf/Vermietung des selbstgenutzten Teils entfällt die Ermäßigung für Folgejahre. Keine Förderung, wenn für dieselbe Maßnahme andere Förderungen (z.B. KfW/BAFA-Zuschuss, zinsverbilligtes Darlehen) oder ein Handwerkerleistungsabzug nach § 35a in Anspruch genommen werden. Fachunternehmerbescheinigung erforderlich.</div><span class="lab">Für wen geeignet</span><p class="forwho">Eigentümer gemischt genutzter Häuser (eigene Wohnung + vermietete Einheiten) - zur optimalen Aufteilung beider Abzugswege.</p><div class="srcline">Quellen: <a href="https://www.gesetze-im-internet.de/estg/__35c.html" target="_blank" rel="noopener">Quelle 1 (gesetze-im-internet.de)</a> <a href="https://www.bundesfinanzministerium.de/Content/DE/Downloads/BMF_Schreiben/Steuerarten/Einkommensteuer/2025-08-21-einzelfragen-energetische-massnahmen.pdf" target="_blank" rel="noopener">Quelle 2 (bundesfinanzministerium.de)</a> <a href="https://www.haufe.de/steuern/steuerwissen-tipps/steuerermaessigung-35c-estg-fuer-energetische-sanierungsmassnahmen/35c-estg-massnahmen-und-berechtigte_170_578432.html" target="_blank" rel="noopener">Quelle 3 (haufe.de)</a></div></div></details>
-<div class="disclaimer"><b>Haftungsausschluss:</b> Dieser Steuer-Tricks-Bereich dient ausschließlich der allgemeinen Information und stellt KEINE Steuer-, Rechts- oder Anlageberatung dar. Trotz sorgfältiger, faktengeprüfter Aufbereitung mit Stand 2026 können einzelne Angaben überholt, vereinfacht oder im konkreten Einzelfall unzutreffend sein - Steuergesetze, Verwaltungsanweisungen (BMF-Schreiben) und die Rechtsprechung (BFH/BGH) ändern sich laufend. Maßgeblich ist immer der aktuelle Gesetzesstand und Ihre individuelle Situation. Jede Gestaltung kann steuerliche, zivilrechtliche und wirtschaftliche Folgen haben, die hier nicht abschließend dargestellt sind. Ziehen Sie vor jeder Umsetzung zwingend eine Steuerberaterin, einen Steuerberater oder eine Rechtsanwältin / einen Rechtsanwalt hinzu. Eine Haftung für Entscheidungen, die Sie auf Basis dieser Inhalte treffen, ist ausgeschlossen.</div>
+<div class="disclaimer"><b>Haftungsausschluss:</b> Dieser Steuerstrategien-Bereich dient ausschließlich der allgemeinen Information und stellt KEINE Steuer-, Rechts- oder Anlageberatung dar. Trotz sorgfältiger Aufbereitung mit Stand 2026 können einzelne Angaben überholt, vereinfacht oder im konkreten Einzelfall unzutreffend sein - Steuergesetze, Verwaltungsanweisungen (BMF-Schreiben) und die Rechtsprechung (BFH/BGH) ändern sich laufend. Maßgeblich ist immer der aktuelle Gesetzesstand und Ihre individuelle Situation. Jede Gestaltung kann steuerliche, zivilrechtliche und wirtschaftliche Folgen haben, die hier nicht abschließend dargestellt sind. Ziehen Sie vor jeder Umsetzung zwingend eine Steuerberaterin, einen Steuerberater oder eine Rechtsanwältin / einen Rechtsanwalt hinzu. Eine Haftung für Entscheidungen, die Sie auf Basis dieser Inhalte treffen, ist ausgeschlossen.</div>
 `;
+  applySteuerFilters();
 }
 
+let steuerCurrentLevel="alle";
 function steuerFilter(lvl, btn){
+  steuerCurrentLevel=lvl;
   document.querySelectorAll("#view-steuer .lvlfilter button").forEach(b=>b.classList.toggle("on", b===btn));
+  applySteuerFilters();
+}
+function steuerSearch(){
+  applySteuerFilters();
+}
+function applySteuerFilters(){
+  const q=($("#steuerSearch")?.value||"").trim().toLowerCase();
+  let visible=0, total=0;
   document.querySelectorAll("#view-steuer .trick").forEach(t=>{
-    t.style.display = (lvl==="alle" || t.getAttribute("data-level")===lvl) ? "" : "none";
+    total++;
+    const levelOk=steuerCurrentLevel==="alle" || t.getAttribute("data-level")===steuerCurrentLevel;
+    const textOk=!q || t.textContent.toLowerCase().includes(q);
+    const show=levelOk && textOk;
+    t.style.display = show ? "" : "none";
+    if(show) visible++;
   });
+  const c=$("#steuerCount"); if(c) c.textContent=`${visible} von ${total} Strategien sichtbar`;
 }
 
 /* ======================= TOOLTIP-OBJEKT ================================== */
@@ -1827,23 +1894,43 @@ window.App = {
     if(id==="bundesland"){ State.grestPct=+(CONFIG.grest[val]*100).toFixed(2); const el=$("#f_grestPct"); if(el) el.value=State.grestPct; }
     App.recalc();
   },
-  recalc(){
-    try{
-      const R=compute(State); App.R=R;
+	  recalc(){
+	    try{
+	      const R=compute(State); App.R=R;
       // Auto-Felder zurückschreiben
       if(State.gebaeudeanteil===0){ const h=$("#hint_gebaeudeanteil"); if(h) h.textContent=`automatisch geschätzt: ${pct(R.gebAnteil)}`; }
       else { const h=$("#hint_gebaeudeanteil"); if(h) h.textContent=""; }
       const hk=$("#hint_grestPct"); if(hk) hk.textContent=State.bundesland;
-      const hr=$("#hint_ruecklageProSqm"); if(hr) hr.textContent=`empfohlen ≈ ${eur(R.ruecklagePetersProSqm)}/m² (Peters)`;
-      const hz=$("#hint_zvE"); if(hz) hz.textContent=`Grenzsteuersatz: ${pct(R.grenzsteuersatz)}`;
-      renderCockpit(R); renderVerlauf(R); renderExit(R); renderStress(R); renderBonitaet(R);
-    }catch(e){ console.error(e); }
-  },
-  tab(id){
-    $$(".tab").forEach(t=>t.classList.toggle("active",t.dataset.id===id));
-    $$(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+id));
-    window.scrollTo({top:0,behavior:"smooth"});
-  },
+	      const hr=$("#hint_ruecklageProSqm"); if(hr) hr.textContent=`empfohlen ≈ ${eur(R.ruecklagePetersProSqm)}/m² (Peters)`;
+	      const hz=$("#hint_zvE"); if(hz) hz.textContent=`Grenzsteuersatz: ${pct(R.grenzsteuersatz)}`;
+	      renderInputWarnings(R);
+	      renderCockpit(R); renderVerlauf(R); renderExit(R); renderStress(R); renderBonitaet(R);
+	    }catch(e){ console.error(e); }
+	  },
+	  tab(id){
+	    $$(".tab").forEach(t=>{
+	      const on=t.dataset.id===id;
+	      t.classList.toggle("active",on);
+	      t.setAttribute("aria-selected", on ? "true" : "false");
+	      t.tabIndex = on ? 0 : -1;
+	    });
+	    $$(".view").forEach(v=>{
+	      const on=v.id==="view-"+id;
+	      v.classList.toggle("active",on);
+	      v.setAttribute("aria-hidden", on ? "false" : "true");
+	    });
+	    window.scrollTo({top:0,behavior:"smooth"});
+	  },
+	  tabKey(ev,id){
+	    const keys=["ArrowRight","ArrowLeft","Home","End"];
+	    if(!keys.includes(ev.key)) return;
+	    ev.preventDefault();
+	    const i=TABS.findIndex(t=>t.id===id);
+	    const next = ev.key==="Home" ? 0 : ev.key==="End" ? TABS.length-1 : ev.key==="ArrowRight" ? (i+1)%TABS.length : (i-1+TABS.length)%TABS.length;
+	    const nextId=TABS[next].id;
+	    App.tab(nextId);
+	    $(`#tab-${nextId}`)?.focus();
+	  },
   save(){ try{ localStorage.setItem("immoRechner",JSON.stringify({name:$("#scenarioName").value,state:State})); App.toast("Gespeichert ✓"); }catch(e){ alert("Speichern fehlgeschlagen: "+e); } },
   load(){ try{ const d=JSON.parse(localStorage.getItem("immoRechner")||"null"); if(d){ Object.assign(State,d.state); if(d.name)$("#scenarioName").value=d.name; } }catch(e){} },
   reset(){ if(confirm("Alle Eingaben auf Standardwerte zurücksetzen?")){ Object.assign(State,defaults(),boniDefaults()); renderForm(); App.recalc(); } },
@@ -1856,8 +1943,11 @@ window.App = {
     Object.assign(State,defaults(),boniDefaults());
     App.load();
     // Tabs
-    $("#tabs").innerHTML=TABS.map(t=>`<div class="tab ${t.id==='eingaben'?'active':''}" data-id="${t.id}" onclick="App.tab('${t.id}')"><span>${t.icon}</span>${t.label}</div>`).join("");
-    renderForm(); renderMethodik(); renderRatgeber(); renderSteuer(); App.recalc();
+	    $("#tabs").innerHTML=TABS.map(t=>{
+	      const on=t.id==="eingaben";
+	      return `<button type="button" class="tab ${on?'active':''}" id="tab-${t.id}" role="tab" aria-selected="${on?'true':'false'}" aria-controls="view-${t.id}" tabindex="${on?0:-1}" data-id="${t.id}" onclick="App.tab('${t.id}')" onkeydown="App.tabKey(event,'${t.id}')"><span class="tab-icon" aria-hidden="true">${t.icon}</span><span>${t.label}</span></button>`;
+	    }).join("");
+	    renderForm(); renderMethodik(); renderRatgeber(); renderSteuer(); App.recalc();
     $("#fileInput").addEventListener("change",ev=>{ const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
       rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.state){ Object.assign(State,d.state); if(d.name)$("#scenarioName").value=d.name; renderForm(); App.recalc(); App.toast("Importiert ✓"); } }catch(e){ alert("Ungültige Datei"); } }; rd.readAsText(f); });
   }
