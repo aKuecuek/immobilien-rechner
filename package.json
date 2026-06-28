@@ -1,0 +1,12 @@
+{
+  "name": "immobilien-rechner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Profi-Immobilien-Investitionsrechner (statische Web-App)",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
