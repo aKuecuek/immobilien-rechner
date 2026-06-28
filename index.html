@@ -1191,41 +1191,54 @@ function renderStress(R){
 }
 
 /* ---------- Bonität ---------- */
-function renderBonitaet(R){
+/* Wichtig gegen Fokusverlust: Die Eingabefelder werden nur EINMAL aufgebaut
+   (renderBonitaet). Bei jeder Berechnung aktualisiert updateBonitaet() nur die
+   berechneten Bereiche (Summen + KPIs) — die Inputs werden nie neu erzeugt,
+   sodass das gerade getippte Feld Fokus und Cursorposition behält. */
+function bonitaetCompute(R){
   const inc=BONI_INCOME.reduce((a,f)=>a+(+State[f.id]||0),0);
   const exp=BONI_EXPENSE.reduce((a,f)=>a+(+State[f.id]||0),0);
-  // Objekt-bezogen: Einnahme Kaltmiete; Ausgabe Kapitaldienst + nicht umlagef. Bewirtschaftung
   const objEinnahme=R.kaltmiete;
   const objAusgabe=R.kapitaldienstJahr/12 + R.nichtUmlM;
   const ueberschuss=inc+objEinnahme - exp - objAusgabe;
-  const assets=BONI_ASSET.reduce((a,f)=>a+(+State[f.id]||0),0)+ (R.gesamtinvest); // dieses Objekt als Vermögenswert
+  const assets=BONI_ASSET.reduce((a,f)=>a+(+State[f.id]||0),0)+ R.gesamtinvest; // dieses Objekt als Vermögenswert
   const debts=BONI_DEBT.reduce((a,f)=>a+(+State[f.id]||0),0)+ R.darlehenGesamt;
-  const netto=assets-debts;
+  return {inc,exp,objEinnahme,objAusgabe,ueberschuss,assets,debts,netto:assets-debts};
+}
+function boIncSum(b){ return `<div class="subhead">aus diesem Objekt</div>
+  <table class="bd"><tr><td>Nettokaltmiete</td><td class="r pos">${eur2(b.objEinnahme)}</td></tr>
+  <tr class="sum"><td>Summe Einnahmen</td><td class="r">${eur2(b.inc+b.objEinnahme)}</td></tr></table>`; }
+function boExpSum(b,R){ return `<div class="subhead">aus diesem Objekt</div>
+  <table class="bd"><tr><td>Kapitaldienst (Zins+Tilgung)</td><td class="r neg">${eur2(R.kapitaldienstJahr/12)}</td></tr>
+  <tr><td>Bewirtschaftung (nicht umlagef.)</td><td class="r neg">${eur2(R.nichtUmlM)}</td></tr>
+  <tr class="sum"><td>Summe Ausgaben</td><td class="r">${eur2(b.exp+b.objAusgabe)}</td></tr></table>`; }
+function boKpis(b){ return [
+    kpiCard("Haushaltsüberschuss / Monat",eur2(b.ueberschuss),"Einnahmen − Ausgaben",b.ueberschuss>=0?"g":"r",GLOSSAR.haushaltsueberschuss),
+    kpiCard("Vermögenswerte",eur(b.assets),"inkl. dieses Objekts","n","Alles, was dir gehört: liquide Mittel, Depots, Immobilien (inkl. dieses Objekts). Die Bank prüft deine Substanz für den Kredit."),
+    kpiCard("Verbindlichkeiten",eur(b.debts),"inkl. dieses Darlehens","n","Alle Schulden: Kredite, dieses Darlehen, Konsumkredite. Gegenstück zu den Vermögenswerten."),
+    kpiCard("Netto-Vermögen",eur(b.netto),"Vermögen − Schulden",b.netto>=0?"g":"r",GLOSSAR.nettovermoegen),
+  ].join(""); }
+function renderBonitaet(){           // Grundgerüst inkl. Eingabefelder — nur einmal / bei Reset/Import
+  const R=App.R||compute(State); const b=bonitaetCompute(R);
   const fin=(arr)=>arr.map(f=>`<div class="field"><label for="b_${f.id}">${f.label}</label>
      <div class="in-wrap"><input id="b_${f.id}" type="number" inputmode="decimal" step="any" class="has-unit" value="${esc(State[f.id])}" oninput="App.set('${f.id}',this.value)"><span class="unit">€</span></div></div>`).join("");
   $("#view-bonitaet").innerHTML=`
     <div class="note">Für das Bankgespräch: Haushaltsrechnung (monatliche Tragfähigkeit) und Vermögensaufstellung. Der Kapitaldienst & die nicht umlagefähigen Kosten dieses Objekts sind automatisch berücksichtigt.</div>
     <div class="grid cols-2" style="margin-top:16px;align-items:start">
-      <div class="panel"><h3>📥 Einnahmen / Monat</h3>${fin(BONI_INCOME)}
-        <div class="subhead">aus diesem Objekt</div>
-        <table class="bd"><tr><td>Nettokaltmiete</td><td class="r pos">${eur2(objEinnahme)}</td></tr>
-        <tr class="sum"><td>Summe Einnahmen</td><td class="r">${eur2(inc+objEinnahme)}</td></tr></table></div>
-      <div class="panel"><h3>📤 Ausgaben / Monat</h3>${fin(BONI_EXPENSE)}
-        <div class="subhead">aus diesem Objekt</div>
-        <table class="bd"><tr><td>Kapitaldienst (Zins+Tilgung)</td><td class="r neg">${eur2(R.kapitaldienstJahr/12)}</td></tr>
-        <tr><td>Bewirtschaftung (nicht umlagef.)</td><td class="r neg">${eur2(R.nichtUmlM)}</td></tr>
-        <tr class="sum"><td>Summe Ausgaben</td><td class="r">${eur2(exp+objAusgabe)}</td></tr></table></div>
+      <div class="panel"><h3>📥 Einnahmen / Monat</h3>${fin(BONI_INCOME)}<div id="bo-incSum">${boIncSum(b)}</div></div>
+      <div class="panel"><h3>📤 Ausgaben / Monat</h3>${fin(BONI_EXPENSE)}<div id="bo-expSum">${boExpSum(b,R)}</div></div>
     </div>
-    <div class="kpis" style="margin-top:16px">
-      ${kpiCard("Haushaltsüberschuss / Monat",eur2(ueberschuss),"Einnahmen − Ausgaben",ueberschuss>=0?"g":"r",GLOSSAR.haushaltsueberschuss)}
-      ${kpiCard("Vermögenswerte",eur(assets),"inkl. dieses Objekts","n","Alles, was dir gehört: liquide Mittel, Depots, Immobilien (inkl. dieses Objekts). Die Bank prüft deine Substanz für den Kredit.")}
-      ${kpiCard("Verbindlichkeiten",eur(debts),"inkl. dieses Darlehens","n","Alle Schulden: Kredite, dieses Darlehen, Konsumkredite. Gegenstück zu den Vermögenswerten.")}
-      ${kpiCard("Netto-Vermögen",eur(netto),"Vermögen − Schulden",netto>=0?"g":"r",GLOSSAR.nettovermoegen)}
-    </div>
+    <div class="kpis" id="bo-kpis" style="margin-top:16px">${boKpis(b)}</div>
     <div class="grid cols-2" style="margin-top:16px;align-items:start">
       <div class="panel"><h3>🏦 Weitere Vermögenswerte</h3>${fin(BONI_ASSET)}</div>
       <div class="panel"><h3>💳 Weitere Verbindlichkeiten</h3>${fin(BONI_DEBT)}</div>
     </div>`;
+}
+function updateBonitaet(R){           // nur berechnete Teile — Eingabefelder unangetastet
+  const b=bonitaetCompute(R);
+  const a=$("#bo-incSum"); if(a) a.innerHTML=boIncSum(b);
+  const c=$("#bo-expSum"); if(c) c.innerHTML=boExpSum(b,R);
+  const k=$("#bo-kpis");   if(k) k.innerHTML=boKpis(b);
 }
 
 /* ---------- Methodik ---------- */
@@ -1971,7 +1984,7 @@ window.App = {
 	      const hz=$("#hint_zvE"); if(hz) hz.textContent=`Grenzsteuersatz: ${pct(R.grenzsteuersatz)}`;
 	      renderInputSummary(R);
 	      renderInputWarnings(R);
-	      renderCockpit(R); renderVerlauf(R); renderExit(R); renderStress(R); renderBonitaet(R);
+	      renderCockpit(R); renderVerlauf(R); renderExit(R); renderStress(R); updateBonitaet(R);
 	    }catch(e){ console.error(e); }
 	  },
 	  tab(id){
@@ -2001,7 +2014,7 @@ window.App = {
 	  },
   save(){ try{ localStorage.setItem("immoRechner",JSON.stringify({name:$("#scenarioName").value,state:State})); App.toast("Gespeichert ✓"); }catch(e){ alert("Speichern fehlgeschlagen: "+e); } },
   load(){ try{ const d=JSON.parse(localStorage.getItem("immoRechner")||"null"); if(d){ Object.assign(State,d.state); if(d.name)$("#scenarioName").value=d.name; } }catch(e){} },
-  reset(){ if(confirm("Alle Eingaben auf Standardwerte zurücksetzen?")){ Object.assign(State,defaults(),boniDefaults()); renderForm(); App.recalc(); } },
+  reset(){ if(confirm("Alle Eingaben auf Standardwerte zurücksetzen?")){ Object.assign(State,defaults(),boniDefaults()); renderForm(); renderBonitaet(); App.recalc(); } },
   exportJSON(){ const blob=new Blob([JSON.stringify({name:$("#scenarioName").value,state:State},null,2)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=($("#scenarioName").value||"szenario")+".immo.json"; a.click(); },
   importJSON(){ $("#fileInput").click(); },
@@ -2015,9 +2028,9 @@ window.App = {
 	      const on=t.id==="eingaben";
 	      return `<button type="button" class="tab ${on?'active':''}" id="tab-${t.id}" role="tab" aria-selected="${on?'true':'false'}" aria-controls="view-${t.id}" tabindex="${on?0:-1}" data-id="${t.id}" onclick="App.tab('${t.id}')" onkeydown="App.tabKey(event,'${t.id}')"><span class="tab-icon" aria-hidden="true">${t.icon}</span><span>${t.label}</span></button>`;
 	    }).join("");
-	    renderForm(); renderMethodik(); renderRatgeber(); renderSteuer(); App.recalc();
+	    renderForm(); renderMethodik(); renderRatgeber(); renderSteuer(); renderBonitaet(); App.recalc();
     $("#fileInput").addEventListener("change",ev=>{ const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
-      rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.state){ Object.assign(State,d.state); if(d.name)$("#scenarioName").value=d.name; renderForm(); App.recalc(); App.toast("Importiert ✓"); } }catch(e){ alert("Ungültige Datei"); } }; rd.readAsText(f); });
+      rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(d.state){ Object.assign(State,d.state); if(d.name)$("#scenarioName").value=d.name; renderForm(); renderBonitaet(); App.recalc(); App.toast("Importiert ✓"); } }catch(e){ alert("Ungültige Datei"); } }; rd.readAsText(f); });
   }
 };
 document.addEventListener("DOMContentLoaded",App.boot);
