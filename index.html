@@ -79,10 +79,24 @@ button.tab{font:inherit;background:transparent}
 .panel{background:linear-gradient(180deg,var(--paper),#f5f8f3);border:1px solid rgba(215,226,219,.95);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
 .panel h3{font-size:14px;text-transform:none;letter-spacing:.01em;color:#174f47;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .panel h3 .num{width:22px;height:22px;border-radius:6px;background:var(--panel2);border:1px solid var(--line2);display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.section-title{margin:22px 0 10px;color:#edf6f1;display:flex;align-items:center;gap:9px;font-size:15px}
+.section-title .ix{width:28px;height:28px;border-radius:8px;background:rgba(247,250,246,.12);border:1px solid rgba(188,205,195,.28);display:grid;place-items:center}
 
 /* Form fields */
+.input-flow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:14px 0}
+.flow-step{text-decoration:none;color:rgba(237,246,241,.78);border:1px solid rgba(188,205,195,.28);background:rgba(247,250,246,.1);border-radius:10px;padding:9px 10px;display:flex;align-items:center;gap:8px;min-height:44px;min-width:0;transition:.15s}
+.flow-step:hover{color:#fff;border-color:rgba(184,135,47,.75);background:rgba(247,250,246,.15);transform:translateY(-1px)}
+.flow-num{width:20px;height:20px;border-radius:6px;background:rgba(15,107,93,.42);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto}
+.flow-ic{font-size:14px;line-height:1;flex:0 0 auto}
+.flow-label{font-size:12px;font-weight:700;line-height:1.25;min-width:0;overflow-wrap:break-word;hyphens:auto}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px;align-items:start}
+.input-panel{scroll-margin-top:92px}
+.input-panel.wide{grid-column:1/-1}
+.input-panel h3 .panel-step{width:22px;height:22px;border-radius:7px;background:#eef6f1;color:#174f47;border:1px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:800}
+.panel-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
 .field{margin-bottom:13px}
 .field:last-child{margin-bottom:0}
+.field.full{grid-column:1/-1}
 .field label{display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:var(--muted);font-size:12.5px;margin-bottom:5px}
 .field label .help{color:var(--muted2);font-size:11px;cursor:help;border-bottom:1px dotted var(--muted2)}
 .in-wrap{position:relative;display:flex;align-items:center}
@@ -133,14 +147,23 @@ button.tab{font:inherit;background:transparent}
 .pos{color:var(--green)}.neg{color:var(--red)}
 
 /* Table */
-.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius)}
-table.data{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
-table.data th,table.data td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
-table.data th{position:sticky;top:0;background:var(--panel2);color:var(--muted);font-weight:600;text-align:right;z-index:1}
-table.data th:first-child,table.data td:first-child{text-align:left;position:sticky;left:0;background:var(--panel)}
-table.data th:first-child{background:var(--panel2)}
-table.data tr:hover td{background:#eef6f1}
-table.data tr.hl td{background:#fff6de}
+.tbl-scroll{overflow:auto;border:1px solid var(--line);border-radius:var(--radius);background:#fbfcf8;box-shadow:var(--shadow)}
+.tbl-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+table.data{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;font-variant-numeric:tabular-nums;background:#fbfcf8;color:var(--txt);min-width:1120px}
+table.data th,table.data td{padding:9px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid #dce7df}
+table.data th{position:sticky;top:0;background:#edf5ee;color:#43544d;font-weight:800;text-align:right;z-index:3;box-shadow:0 1px 0 #d4e2d9}
+table.data th:first-child,table.data td:first-child{text-align:left;position:sticky;left:0;z-index:2;font-weight:750;color:#174f47;box-shadow:1px 0 0 #dce7df}
+table.data th:first-child{background:#edf5ee;z-index:4}
+table.data tbody tr:nth-child(odd) td{background:#fbfcf8}
+table.data tbody tr:nth-child(even) td{background:#f2f7f2}
+table.data tbody tr:nth-child(odd) td:first-child{background:#fbfcf8}
+table.data tbody tr:nth-child(even) td:first-child{background:#f2f7f2}
+table.data tbody tr.hl td{background:#fff6de;border-top:1px solid #eadfbb;border-bottom:1px solid #eadfbb}
+table.data tbody tr.hl td:first-child{background:#fff6de}
+table.data tbody tr:hover td{background:#e8f3ed}
+table.data tbody tr:hover td:first-child{background:#e8f3ed}
+table.data td.pos{color:#0e7146;font-weight:700}
+table.data td.neg{color:#aa342b;font-weight:700}
 
 /* charts */
 .chart-box{background:linear-gradient(180deg,#fff,#f7faf6);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
@@ -254,6 +277,10 @@ summary{cursor:pointer;padding:9px 0;font-weight:600}
   .tab{padding:9px 13px}
   /* zweispaltige Eingabe-Bereiche untereinander */
   .grid.cols-2{grid-template-columns:1fr}
+  .input-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .form-grid{grid-template-columns:1fr}
+  .input-panel.wide{grid-column:auto}
+  .panel-fields{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr;gap:10px}
   .kpi{padding:13px}
   .kpi .val{font-size:21px}
@@ -868,23 +895,27 @@ function field(f){
     inp=`<div class="in-wrap"><input id="f_${id}" type="number" inputmode="decimal" step="any" class="${f.unit?'has-unit':''}" value="${esc(v)}" ${f.compute?'readonly aria-readonly="true"':''} oninput="App.set('${id}',this.value)">${unit}</div>`;
   }
   const help=f.help?`<span class="help" data-tip="${esc(f.help)}" tabindex="0">?</span>`:"";
-  return `<div class="field ${f.compute?'compute':''} ${f.full?'':''}">
+  return `<div class="field ${f.compute?'compute':''} ${f.full?'full':''}">
     <label for="f_${id}">${f.label} ${help}</label>${inp}
     <div class="hint" id="hint_${id}"></div></div>`;
 }
 function renderForm(){
-  const left=["obj","kauf","miete"], right=["bewirt","fin","steuer","annahmen"];
-  const col=ids=>SCHEMA.filter(g=>ids.includes(g.id)).map(g=>
-    `<div class="panel"><h3>${g.icon} ${g.title}</h3>${g.fields.map(field).join("")}</div>`).join("");
+  const flowLabels={obj:"Objekt",kauf:"Kauf",miete:"Miete",bewirt:"Kosten",fin:"Finanzierung",steuer:"Steuer",annahmen:"Prognose"};
+  const flow=SCHEMA.map((g,i)=>`<a class="flow-step" href="#panel-${g.id}" aria-label="${i+1}. ${esc(g.title)}">
+    <span class="flow-num">${i+1}</span><span class="flow-ic" aria-hidden="true">${g.icon}</span><span class="flow-label">${flowLabels[g.id]||g.title}</span>
+  </a>`).join("");
+  const panels=SCHEMA.map((g,i)=>
+    `<div class="panel input-panel ${g.id==="annahmen"?"wide":""}" id="panel-${g.id}">
+      <h3><span class="panel-step">${i+1}</span>${g.icon} ${g.title}</h3>
+      <div class="panel-fields">${g.fields.map(field).join("")}</div>
+    </div>`).join("");
   $("#view-eingaben").innerHTML=`
     <div class="note">Trage die Objektdaten ein. Alle Werte werden sofort berechnet — wechsle danach ins <b>Cockpit</b>.
       Felder mit gestricheltem Rand werden automatisch ermittelt (z. B. Grunderwerbsteuer je Bundesland; Gebäudeanteil bei Eingabe 0 %).</div>
     <div class="input-summary" id="inputSummary" aria-live="polite"></div>
     <div class="validation-stack" id="inputWarnings" aria-live="polite"></div>
-    <div class="grid cols-2" style="margin-top:16px;align-items:start">
-      <div class="grid">${col(left)}</div>
-      <div class="grid">${col(right)}</div>
-    </div>`;
+    <div class="input-flow">${flow}</div>
+    <div class="form-grid">${panels}</div>`;
 }
 
 function renderInputSummary(R){
@@ -1043,8 +1074,8 @@ function renderVerlauf(R){
       <div class="chart-box"><h4>Kumulierter Cashflow nach Steuern</h4>
         ${svgLineChart(ys,[{key:"kumCfNach",label:"Σ Cashflow n. St.",color:"#a78bfa"}],{fmt:"eur",zero:true})}</div>
     </div>
-    <h3 style="margin:22px 0 10px;color:var(--accent)">📋 Jahr-für-Jahr Projektion</h3>
-    <div class="tbl-scroll"><table class="data"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    <h3 class="section-title"><span class="ix" aria-hidden="true">📋</span>Jahr-für-Jahr Projektion</h3>
+    <div class="tbl-scroll" tabindex="0" aria-label="Jahr-für-Jahr Projektion als scrollbare Tabelle"><table class="data"><caption class="sr-only">Jahr-für-Jahr Projektion der Miete, Kosten, Cashflows, Restschuld und Vermögenswerte</caption><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 /* ---------- SVG-Charts ---------- */
@@ -1955,6 +1986,7 @@ window.App = {
 	      v.classList.toggle("active",on);
 	      v.setAttribute("aria-hidden", on ? "false" : "true");
 	    });
+	    $(`#tab-${id}`)?.scrollIntoView({inline:"nearest",block:"nearest"});
 	    window.scrollTo({top:0,behavior:"smooth"});
 	  },
 	  tabKey(ev,id){
