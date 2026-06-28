@@ -30,7 +30,11 @@ Es ist eine einzelne, statische HTML‑Datei → überall hostbar:
 | **Exit & Verkauf** | Verkaufsrechnung, Spekulationssteuer‑Check (10‑Jahres‑Frist), Gesamtrendite, IRR |
 | **Stresstest** | Sensitivität bei Zins‑, Mietausfall‑, Wertsteigerungs‑ und Mietniveau‑Änderung |
 | **Bonität / Bank** | Haushaltsrechnung & Vermögensaufstellung fürs Bankgespräch |
+| **Anleitung & Ratgeber** | Schritt‑für‑Schritt‑Guide für Einsteiger: So nutzt du den Rechner, Kaufprozess (Vorbereitung → Notar → nach dem Kauf), Kennzahlen verständlich erklärt + Faustregeln, Anlagestrategien & typische Anfängerfehler |
+| **Steuer‑Tricks** | 71 legale Steueroptimierungs‑Strategien wie von einer Beraterin – nach Kategorien (AfA, Renovierung, Werbungskosten, Exit, Vermietungsart, Gesellschaften, Schenkung/Nießbrauch, Grunderwerbsteuer) mit Laienerklärung, Umsetzung, Rechenbeispiel, Rechtsgrundlage, Risiken & Quellen. Filterbar nach Einsteiger/Fortgeschritten/Profi. Faktengeprüft, Stand 2026 |
 | **Methodik & Quellen** | Alle Formeln, Steuerregeln 2026, GrESt‑Tabelle, autoritative Quellen |
+
+> 💡 **Tooltips überall:** Hinter jedem Fachbegriff (auch bei den Kennzahlen im Cockpit, in den Tabellen und im Ratgeber) steckt ein kleines „i"‑Symbol. Mit Maus drüberfahren oder antippen zeigt eine kurze, laienverständliche Erklärung.
 
 ## Speichern / Teilen
 
